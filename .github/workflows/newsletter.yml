@@ -1,0 +1,31 @@
+name: 서울 교통 뉴스레터 자동 발송
+
+on:
+  schedule:
+    # 매일 오전 8시 KST (= UTC 23:00, 전날)
+    - cron: '0 23 * * *'
+  # 수동 실행 버튼 (테스트용)
+  workflow_dispatch:
+
+jobs:
+  send-newsletter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 패키지 설치
+        run: pip install -r requirements.txt
+
+      - name: 뉴스레터 발송
+        env:
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
+          RECIPIENT_EMAILS: ${{ secrets.RECIPIENT_EMAILS }}
+        run: python transport_newsletter.py
